@@ -60,6 +60,17 @@ namespace MusicLessonSch.Controllers
             return View();
         }
 
+        public async Task<IActionResult> DeleteConfirm(int id)
+        {
+            var instrument = await _context.Instrument.Where(i => i.Id == id).FirstAsync();
+            if (instrument == null)
+            {
+                return NotFound();
+            }
+            return View(instrument);
+
+        }
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)

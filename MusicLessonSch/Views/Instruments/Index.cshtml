@@ -20,10 +20,7 @@
                 <td>@Html.DisplayFor(modelItem => item.Name)</td>
                 <td>@Html.DisplayFor(modelItem => item.MinAge)</td>
                 <td><a href="/Instruments/Edit/@item.Id">Edit</a></td>
-                <td><form asp-action="Delete" method="post" class="delete-instrument" style="display: inline;">
-                        <input type="hidden" value="@item.Id" name="id" />
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                </form></td>
+                <td><a href="/Instruments/DeleteConfirm/@item.Id">Delete</a></td>
             </tr>
         }
     </tbody>
