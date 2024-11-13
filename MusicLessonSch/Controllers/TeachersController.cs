@@ -22,7 +22,8 @@ namespace MusicLessonSch.Controllers
         // GET: Teachers
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Teacher.ToListAsync());
+            var teachers = _context.Teacher.Include(t => t.Instruments);
+            return View(await teachers.ToListAsync());
         }
 
         // GET: Teachers/Details/5
@@ -76,6 +77,11 @@ namespace MusicLessonSch.Controllers
                 _context.Teacher.Add(teacher);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
+            }
+            var instruments = await _context.Instrument.ToListAsync();
+            foreach(var i in instruments)
+            {
+                teacherVM.Instruments.Add(i);
             }
             return View(teacherVM);
         }
@@ -161,6 +167,34 @@ namespace MusicLessonSch.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> AddInstrument(int id, string name)
+        {
+            var instruments = await _context.Instrument.ToListAsync();
+            var teacherVM = new TeacherViewModel
+            {
+                Id = id,
+                Instruments = instruments,
+                Name = name
+            };
+            return View(teacherVM);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddInstrument([Bind("Id","InstrumentId")] TeacherViewModel teacherVM)
+        {
+            /*
+            TODO:
+                handle duplicate entries
+             */
+            var teacher = _context.Teacher.Where(t => t.Id == teacherVM.Id).First();
+            var instrument = _context.Instrument.Where(i => i.Id == teacherVM.InstrumentId).First();
+            teacher.Instruments.Add(instrument);
+            _context.Teacher.Update(teacher);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index");
         }
 
         private bool TeacherExists(int id)

@@ -3,13 +3,4 @@
 
 // Write your JavaScript code.
 
-$(function () {
-    $(".delete-instrument").on("submit", evt => {
 
-        const userConfirm = confirm("Are you sure you want to delete this instrument?");
-        if (userConfirm) {
-            return true;
-        }
-        return false;
-    })
-})

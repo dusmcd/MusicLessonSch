@@ -1,1 +1,39 @@
-﻿<h1>Teacher Index page</h1>
+﻿@model IEnumerable<MusicLessonSch.Models.Teacher>;
+@{
+    ViewData["Title"] = "Teachers";
+}
+
+<h1>Teachers</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(m => m.Name)</th>
+            <th>@Html.DisplayNameFor(m => m.PhoneNumber)</th>
+            <th>@Html.DisplayNameFor(m => m.Email)</th>
+            <th>@Html.DisplayNameFor(m => m.DateOfBirth)</th>
+            <th>@Html.DisplayNameFor(m => m.Instruments)</th>
+            <th></th>
+    </thead>
+    <tbody>
+        @foreach(var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.PhoneNumber)</td>
+                <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                <td>@Html.DisplayFor(modelItem => item.DateOfBirth)</td>
+                <td>
+                    <ul>
+                @foreach(var instrument in item.Instruments)
+                {
+                        <li>@instrument.Name</li> 
+                }
+                    </ul>
+                </td>
+                <td><a href="/Teachers/AddInstrument/@item.Id?name=@item.Name">Add Instrument</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
+<a asp-action="Create" class="btn btn-success">Add Teacher</a>

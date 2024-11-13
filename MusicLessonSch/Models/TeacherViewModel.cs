@@ -20,7 +20,7 @@ namespace MusicLessonSch.Models
 
         public List<Instrument> Instruments { get; set; } = [];
 
-        [DisplayName("Instrument")]
+        [Required, DisplayName("Instrument")]
         public int InstrumentId { get; set; }
 
         [DisplayName("Instrument Name")]
