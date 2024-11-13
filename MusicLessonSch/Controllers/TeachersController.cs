@@ -44,9 +44,15 @@ namespace MusicLessonSch.Controllers
         }
 
         // GET: Teachers/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            var instruments = await _context.Instrument.ToListAsync();
+            var teacherVM = new TeacherViewModel
+            {
+                Instruments = instruments,
+                DateOfBirth = DateTime.Now,
+            };
+            return View(teacherVM);
         }
 
         // POST: Teachers/Create
@@ -54,18 +60,26 @@ namespace MusicLessonSch.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,PhoneNumber,Email,DateOfBirth")] Teacher teacher)
+        public async Task<IActionResult> Create([Bind("Id", "Name", "PhoneNumber", "Email", "DateOfBirth", "InstrumentId")] TeacherViewModel teacherVM)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(teacher);
+                var instrument = _context.Instrument.Where(i => i.Id == teacherVM.InstrumentId).First();
+                var teacher = new Teacher
+                {
+                    Name = teacherVM.Name,
+                    PhoneNumber = teacherVM.PhoneNumber,
+                    Email = teacherVM.Email,
+                    DateOfBirth = teacherVM.DateOfBirth,
+                };
+                teacher.Instruments.Add(instrument);
+                _context.Teacher.Add(teacher);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
             }
-            return View(teacher);
+            return View(teacherVM);
         }
 
-        // GET: Teachers/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
