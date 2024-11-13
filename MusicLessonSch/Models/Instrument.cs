@@ -7,7 +7,7 @@ namespace MusicLessonSch.Models
     {
         public int Id { get; set; }
 
-        [Required]
+        [Required, DisplayName("Instrument Name")]
         public string? Name { get; set; }
 
         [DisplayName("Minimum Age")]
