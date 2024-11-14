@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MusicLessonSch.Data;
 
@@ -11,9 +12,11 @@ using MusicLessonSch.Data;
 namespace MusicLessonSch.Migrations
 {
     [DbContext(typeof(MusicLessonSchContext))]
-    partial class MusicLessonSchContextModelSnapshot : ModelSnapshot
+    [Migration("20241114131123_AvailabilityNav")]
+    partial class AvailabilityNav
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

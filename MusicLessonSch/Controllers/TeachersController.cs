@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -171,7 +173,14 @@ namespace MusicLessonSch.Controllers
 
         public async Task<IActionResult> AddInstrument(int id, string name)
         {
-            var instruments = await _context.Instrument.ToListAsync();
+            var instruments = await _context.Instrument
+                .Include(i => i.Teachers)
+                .Where(i => !i.Teachers.Any(t => t.Id == id))
+                .ToListAsync();
+            if (instruments.Count == 0)
+            {
+                return RedirectToAction("Index");
+            }
             var teacherVM = new TeacherViewModel
             {
                 Id = id,
@@ -185,16 +194,33 @@ namespace MusicLessonSch.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddInstrument([Bind("Id","InstrumentId")] TeacherViewModel teacherVM)
         {
-            /*
-            TODO:
-                handle duplicate entries
-             */
-            var teacher = _context.Teacher.Where(t => t.Id == teacherVM.Id).First();
-            var instrument = _context.Instrument.Where(i => i.Id == teacherVM.InstrumentId).First();
-            teacher.Instruments.Add(instrument);
-            _context.Teacher.Update(teacher);
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Index");
+            try
+            {
+                var teacher = _context.Teacher
+                    .Where(t => t.Id == teacherVM.Id)
+                    .Include(t => t.Instruments)
+                    .First();
+                var instrument = _context.Instrument
+                    .Where(i => i.Id == teacherVM.InstrumentId)
+                    .First();
+                if (IsDuplicate(teacher, teacherVM.InstrumentId))
+                {
+                    throw new Exception("Duplicate entry");
+                }
+                teacher.Instruments.Add(instrument);
+                _context.Teacher.Update(teacher);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Index");
+            } catch(Exception ex)
+            {
+                return Problem(ex.Message);
+            }
+            
+        }
+
+        private bool IsDuplicate(Teacher teacher, int instrumentId)
+        {
+            return teacher.Instruments.Any(i => i.Id == instrumentId);
         }
 
         private bool TeacherExists(int id)

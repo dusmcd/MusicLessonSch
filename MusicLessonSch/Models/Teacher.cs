@@ -20,5 +20,7 @@ namespace MusicLessonSch.Models
         public List<Student> Students { get; } = [];
 
         public List<Instrument> Instruments { get; } = [];
+
+        public List<Availability> Availability { get; } = [];
     }
 }

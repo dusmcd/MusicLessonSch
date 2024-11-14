@@ -17,7 +17,7 @@ namespace MusicLessonSch.Models
         [Required, DisplayName("Start Time"), DataType(DataType.Time)]
         public DateTime StartTime { get; set; }
 
-        [Required, DisplayName("End Tiime"), DataType(DataType.Time)]
+        [Required, DisplayName("End Time"), DataType(DataType.Time)]
         public DateTime EndTime { get; set; }
     }
 }
