@@ -18,7 +18,7 @@ namespace MusicLessonSch.Models
         [Required, DisplayName("Date of Birth"), DataType(DataType.Date)]
         public DateTime DateOfBirth { get; set; }
 
-        public List<Instrument> Instruments { get; set; } = [];
+        public List<InstrumentViewModel> Instruments { get; set; } = [];
 
         [Required, DisplayName("Instrument")]
         public int InstrumentId { get; set; }

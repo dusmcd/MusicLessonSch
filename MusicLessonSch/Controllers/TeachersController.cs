@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.EntityFrameworkCore;
 using MusicLessonSch.Data;
 using MusicLessonSch.Models;
@@ -50,11 +51,21 @@ namespace MusicLessonSch.Controllers
         public async Task<IActionResult> Create()
         {
             var instruments = await _context.Instrument.ToListAsync();
+            
             var teacherVM = new TeacherViewModel
             {
-                Instruments = instruments,
                 DateOfBirth = DateTime.Now,
             };
+
+            foreach(var item in instruments)
+            {
+                var instrumentVM = new InstrumentViewModel
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                };
+                teacherVM.Instruments.Add(instrumentVM);
+            }
             return View(teacherVM);
         }
 
@@ -63,7 +74,7 @@ namespace MusicLessonSch.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id", "Name", "PhoneNumber", "Email", "DateOfBirth", "InstrumentId")] TeacherViewModel teacherVM)
+        public async Task<IActionResult> Create([Bind("Id","Name","PhoneNumber","Email","DateOfBirth","InstrumentId")] TeacherViewModel teacherVM)
         {
             if (ModelState.IsValid)
             {
@@ -80,11 +91,11 @@ namespace MusicLessonSch.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            var instruments = await _context.Instrument.ToListAsync();
-            foreach(var i in instruments)
-            {
-                teacherVM.Instruments.Add(i);
-            }
+            //var instruments = await _context.Instrument.ToListAsync();
+            //foreach(var i in instruments)
+            //{
+            //    teacherVM.Instruments.Add(i);
+            //}
             return View(teacherVM);
         }
 
@@ -95,12 +106,30 @@ namespace MusicLessonSch.Controllers
                 return NotFound();
             }
 
-            var teacher = await _context.Teacher.FindAsync(id);
+            var teacher = await _context.Teacher.Where(t => t.Id == id).Include(t => t.Instruments).FirstAsync();
+            var teacherVM = new TeacherViewModel
+            {
+                Id = teacher.Id,
+                Name = teacher.Name,
+                PhoneNumber = teacher.PhoneNumber,
+                Email = teacher.Email,
+                DateOfBirth= teacher.DateOfBirth,
+            };
+
+            foreach(var item in teacher.Instruments)
+            {
+                var instrumentVM = new InstrumentViewModel
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                };
+                teacherVM.Instruments.Add(instrumentVM);
+            }
             if (teacher == null)
             {
                 return NotFound();
             }
-            return View(teacher);
+            return View(teacherVM);
         }
 
         // POST: Teachers/Edit/5
@@ -108,9 +137,9 @@ namespace MusicLessonSch.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,PhoneNumber,Email,DateOfBirth")] Teacher teacher)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,PhoneNumber,Email,DateOfBirth","Instruments")] TeacherViewModel teacherVM)
         {
-            if (id != teacher.Id)
+            if (id != teacherVM.Id)
             {
                 return NotFound();
             }
@@ -119,12 +148,24 @@ namespace MusicLessonSch.Controllers
             {
                 try
                 {
-                    _context.Update(teacher);
+                    var removedInstruments = GetRemovedInstruments(teacherVM.Instruments);
+                    var teacher = _context.Teacher.Where(t => t.Id == teacherVM.Id).Include(t => t.Instruments).First();
+                    teacher.Id = teacherVM.Id;
+                    teacher.Name = teacherVM.Name;
+                    teacher.PhoneNumber = teacherVM.PhoneNumber;
+                    teacher.Email = teacherVM.Email;
+                    teacher.DateOfBirth = teacherVM.DateOfBirth;
+
+                    foreach(var inst in removedInstruments)
+                    {
+                        teacher.Instruments.Remove(inst);
+                    }
+                    _context.Teacher.Update(teacher);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TeacherExists(teacher.Id))
+                    if (!TeacherExists(teacherVM.Id))
                     {
                         return NotFound();
                     }
@@ -135,7 +176,21 @@ namespace MusicLessonSch.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(teacher);
+            return View(teacherVM);
+        }
+
+        private List<Instrument> GetRemovedInstruments(List<InstrumentViewModel> removedInstruments)
+        {
+            var result = new List<Instrument>();
+            foreach(var item in removedInstruments)
+            {
+                if (item.IsRemoved)
+                {
+                    var instrument = _context.Instrument.Find(item.Id);
+                    result.Add(instrument!);
+                }
+            }
+            return result;
         }
 
         // GET: Teachers/Delete/5
@@ -184,9 +239,18 @@ namespace MusicLessonSch.Controllers
             var teacherVM = new TeacherViewModel
             {
                 Id = id,
-                Instruments = instruments,
                 Name = name
             };
+
+            foreach(var item in instruments)
+            {
+                var instrumentVM = new InstrumentViewModel
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                };
+                teacherVM.Instruments.Add(instrumentVM);
+            }
             return View(teacherVM);
         }
 
@@ -203,10 +267,12 @@ namespace MusicLessonSch.Controllers
                 var instrument = _context.Instrument
                     .Where(i => i.Id == teacherVM.InstrumentId)
                     .First();
+
                 if (IsDuplicate(teacher, teacherVM.InstrumentId))
                 {
                     throw new Exception("Duplicate entry");
                 }
+
                 teacher.Instruments.Add(instrument);
                 _context.Teacher.Update(teacher);
                 await _context.SaveChangesAsync();
@@ -217,6 +283,7 @@ namespace MusicLessonSch.Controllers
             }
             
         }
+
 
         private bool IsDuplicate(Teacher teacher, int instrumentId)
         {

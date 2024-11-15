@@ -14,6 +14,7 @@
             <th>@Html.DisplayNameFor(m => m.DateOfBirth)</th>
             <th>@Html.DisplayNameFor(m => m.Instruments)</th>
             <th></th>
+            <th></th>
     </thead>
     <tbody>
         @foreach(var item in Model)
@@ -32,6 +33,7 @@
                     </ul>
                 </td>
                 <td><a href="/Teachers/AddInstrument/@item.Id?name=@item.Name">Add Instrument</a></td>
+                <td><a href="/Teachers/Edit/@item.Id">Edit Teacher</a></td>
             </tr>
         }
     </tbody>
