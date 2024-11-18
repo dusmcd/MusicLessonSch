@@ -25,5 +25,18 @@ namespace MusicLessonSch.Models
 
         [DisplayName("Instrument Name")]
         public string? InstrumentName { get; set; }
+
+        public override ViewModel Copy()
+        {
+            TeacherViewModel teacher = new TeacherViewModel();
+            teacher.Id = Id;
+            teacher.Name = Name;
+            teacher.PhoneNumber = PhoneNumber;
+            teacher.DateOfBirth = DateOfBirth;
+            teacher.InstrumentId = InstrumentId;
+            teacher.InstrumentName = InstrumentName;
+
+            return teacher;
+        }
     }
 }

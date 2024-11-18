@@ -6,6 +6,11 @@ namespace MusicLessonSch.Models
 {
     public class ViewModel
     {
+        /*
+            copy the primitive type properties
+            i.e., do not copy over reference types
+            (e.g., user-defined objects or other objects)
+         */
         public virtual ViewModel Copy()
         {
             throw new NotImplementedException();

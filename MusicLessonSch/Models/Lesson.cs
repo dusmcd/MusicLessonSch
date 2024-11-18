@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MusicLessonSch.Models
 {
-    public class Lesson
+    public class Lesson : Model
     {
         public int StudentId { get; set; }
 
@@ -20,6 +20,18 @@ namespace MusicLessonSch.Models
 
         [Required, DisplayName("First Lesson Date"), DataType(DataType.Date)]
         public DateTime FirstLessonDate { get; set; }
+
+        public override Model Copy()
+        {
+            Lesson lesson = new Lesson();
+            lesson.StudentId = StudentId;
+            lesson.Day = Day;
+            lesson.LessonTime = LessonTime;
+            lesson.Duration = Duration;
+            lesson.FirstLessonDate = FirstLessonDate;
+
+            return lesson;
+        }
 
 
 

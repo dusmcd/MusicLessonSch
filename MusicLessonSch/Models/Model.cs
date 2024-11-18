@@ -4,6 +4,16 @@ namespace MusicLessonSch.Models
 {
     public class Model
     {
+        /*
+            copy the primitive type properties
+            i.e., do not copy over reference types
+            (e.g., user-defined objects or other objects)
+         */
+        public virtual Model Copy()
+        {
+            throw new NotImplementedException();
+        }
+
         public void MapPropsToVM(ViewModel vm)
         {
             PropertyInfo[] modelProps = this.GetType().GetProperties();

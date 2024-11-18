@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MusicLessonSch.Models
 {
-    public class Availability
+    public class Availability : Model
     {
         public int Id { get; set; }
 
@@ -19,5 +19,17 @@ namespace MusicLessonSch.Models
 
         [Required, DisplayName("End Time"), DataType(DataType.Time)]
         public DateTime EndTime { get; set; }
+
+        public override Model Copy()
+        {
+            Availability availability = new Availability();
+            availability.Id = Id;
+            availability.Day = Day;
+            availability.StartTime = StartTime;
+            availability.EndTime = EndTime;
+            availability.TeacherId = TeacherId;
+
+            return availability;
+        }
     }
 }

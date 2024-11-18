@@ -17,6 +17,16 @@ namespace MusicLessonSch.Models
 
         public List<Teacher> Teachers { get; } = [];
 
-        
+        public override Model Copy()
+        {
+            Instrument instrument = new Instrument();
+            instrument.Id = Id;
+            instrument.Name = Name;
+            instrument.MinAge = MinAge;
+
+            return instrument;
+        }
+
+
     }
 }

@@ -22,6 +22,18 @@ namespace MusicLessonSch.Models
 
         public List<Instrument> Instruments { get; } = [];
 
+        public override Model Copy()
+        {
+            Student student = new Student();
+            student.Id = Id;
+            student.Name = Name;
+            student.PhoneNumber = PhoneNumber;
+            student.Email = Email;
+            student.Age = Age;
+
+            return student;
+        }
+
 
     }
 }
