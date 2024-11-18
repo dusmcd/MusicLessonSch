@@ -39,15 +39,16 @@ namespace MusicLessonSch.Models
 
         }
 
-        public void MapListPropsToMode(List<Model> modelList, List<ViewModel> vmList)
+        public static void MapListPropsToModel(ViewModel[] vmList, Model[] modelList, Model defaultModel)
         {
-            if (vmList.Count < 1)
+            if (vmList.Length < 1)
             {
                 return;
             }
 
-            for(int i = 0; i < vmList.Count; i++)
+            for(int i = 0; i < vmList.Length; i++)
             {
+                modelList[i] = defaultModel.Copy();
                 vmList[i].MapPropsToModel(modelList[i]);
             }
         }

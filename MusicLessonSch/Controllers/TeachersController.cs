@@ -86,16 +86,11 @@ namespace MusicLessonSch.Controllers
                 FirstAsync();
             TeacherViewModel teacherVM = new TeacherViewModel() { };
             teacher.MapPropsToVM(teacherVM);
+            InstrumentViewModel[] viewModels = new InstrumentViewModel[teacher.Instruments.Count];
+            InstrumentViewModel defaultVM = new InstrumentViewModel() { };
+            Instrument.MapListVMToModel(teacher.Instruments.ToArray(), viewModels, defaultVM);
 
-            foreach(var item in teacher.Instruments)
-            {
-                var instrumentVM = new InstrumentViewModel
-                {
-                    Id = item.Id,
-                    Name = item.Name,
-                };
-                teacherVM.Instruments.Add(instrumentVM);
-            }
+            teacherVM.Instruments = viewModels.ToList(); 
             if (teacher == null)
             {
                 return NotFound();
