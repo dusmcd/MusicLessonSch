@@ -29,43 +29,19 @@ namespace MusicLessonSch.Controllers
             return View(await teachers.ToListAsync());
         }
 
-        // GET: Teachers/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var teacher = await _context.Teacher
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (teacher == null)
-            {
-                return NotFound();
-            }
-
-            return View(teacher);
-        }
-
         // GET: Teachers/Create
         public async Task<IActionResult> Create()
         {
-            var instruments = await _context.Instrument.ToListAsync();
-            
+            var instruments = await _context.Instrument.ToArrayAsync();
+            InstrumentViewModel[] viewModels = new InstrumentViewModel[instruments.Length];
+            Instrument.MapListVMToModel(instruments, viewModels, new InstrumentViewModel() { });
             var teacherVM = new TeacherViewModel
             {
                 DateOfBirth = DateTime.Now,
+                Instruments = viewModels.ToList()
             };
 
-            foreach(var item in instruments)
-            {
-                var instrumentVM = new InstrumentViewModel
-                {
-                    Id = item.Id,
-                    Name = item.Name,
-                };
-                teacherVM.Instruments.Add(instrumentVM);
-            }
+            
             return View(teacherVM);
         }
 
@@ -78,16 +54,14 @@ namespace MusicLessonSch.Controllers
         {
             if (ModelState.IsValid)
             {
-                var instrument = _context.Instrument.Where(i => i.Id == teacherVM.InstrumentId).First();
-                var teacher = new Teacher
-                {
-                    Name = teacherVM.Name,
-                    PhoneNumber = teacherVM.PhoneNumber,
-                    Email = teacherVM.Email,
-                    DateOfBirth = teacherVM.DateOfBirth,
-                };
+                Instrument instrument = _context.Instrument
+                    .Where(i => i.Id == teacherVM.InstrumentId).First();
+                Teacher teacher = new Teacher { };
+
+                teacherVM.MapPropsToModel(teacher);
                 teacher.Instruments.Add(instrument);
                 _context.Teacher.Add(teacher);
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
@@ -106,15 +80,12 @@ namespace MusicLessonSch.Controllers
                 return NotFound();
             }
 
-            var teacher = await _context.Teacher.Where(t => t.Id == id).Include(t => t.Instruments).FirstAsync();
-            var teacherVM = new TeacherViewModel
-            {
-                Id = teacher.Id,
-                Name = teacher.Name,
-                PhoneNumber = teacher.PhoneNumber,
-                Email = teacher.Email,
-                DateOfBirth= teacher.DateOfBirth,
-            };
+            Teacher teacher = await _context.Teacher.
+                Where(t => t.Id == id).
+                Include(t => t.Instruments).
+                FirstAsync();
+            TeacherViewModel teacherVM = new TeacherViewModel() { };
+            teacher.MapPropsToVM(teacherVM);
 
             foreach(var item in teacher.Instruments)
             {
@@ -149,12 +120,11 @@ namespace MusicLessonSch.Controllers
                 try
                 {
                     var removedInstruments = GetRemovedInstruments(teacherVM.Instruments);
-                    var teacher = _context.Teacher.Where(t => t.Id == teacherVM.Id).Include(t => t.Instruments).First();
-                    teacher.Id = teacherVM.Id;
-                    teacher.Name = teacherVM.Name;
-                    teacher.PhoneNumber = teacherVM.PhoneNumber;
-                    teacher.Email = teacherVM.Email;
-                    teacher.DateOfBirth = teacherVM.DateOfBirth;
+                    var teacher = _context.Teacher
+                        .Where(t => t.Id == teacherVM.Id)
+                        .Include(t => t.Instruments)
+                        .First();
+                    teacherVM.MapPropsToModel(teacher);
 
                     foreach(var inst in removedInstruments)
                     {

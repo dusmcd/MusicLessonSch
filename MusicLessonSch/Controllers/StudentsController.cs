@@ -16,26 +16,20 @@ namespace MusicLessonSch.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var students = await _context.Student.Include(s => s.Instruments).ToListAsync();
+            List<Student> students = await _context.Student.Include(s => s.Instruments).ToListAsync();
             return View(students);
         }
 
         public async Task<IActionResult> Create()
         {
-            var instruments = await _context.Instrument.ToListAsync();
-            List<InstrumentViewModel> instrumentsVM = new List<InstrumentViewModel>();
-            foreach(var item in instruments)
+            Instrument[] instruments = await _context.Instrument.ToArrayAsync();
+            InstrumentViewModel[] viewModels = new InstrumentViewModel[instruments.Length];
+
+            Instrument.MapListVMToModel(instruments, viewModels, new InstrumentViewModel() { });
+            
+            StudentViewModel student = new StudentViewModel
             {
-                var instrumentVM = new InstrumentViewModel
-                {
-                    Id = item.Id,
-                    Name = item.Name,
-                };
-                instrumentsVM.Add(instrumentVM);
-            }
-            var student = new StudentViewModel
-            {
-                Instruments = instrumentsVM,
+                Instruments = viewModels.ToList()
             };
             return View(student);
         }
@@ -44,13 +38,8 @@ namespace MusicLessonSch.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id","Name","PhoneNumber","Email","Age", "InstrumentId")] StudentViewModel studentVM)
         {
-            var student = new Student
-            {
-                Name = studentVM.Name,
-                PhoneNumber = studentVM.PhoneNumber,
-                Email = studentVM.Email,
-                Age = studentVM.Age,
-            };
+            Student student = new Student { };
+            studentVM.MapPropsToModel(student);
             var instrument = _context.Instrument.Find(studentVM.InstrumentId);
             student.Instruments.Add(instrument!);
             _context.Student.Add(student);

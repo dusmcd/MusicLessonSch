@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MusicLessonSch.Models
 {
-    public class StudentViewModel
+    public class StudentViewModel : ViewModel
     {
         public int Id { get; set; }
 
@@ -18,7 +18,7 @@ namespace MusicLessonSch.Models
         [Required]
         public int Age { get; set; }
 
-        public List<Teacher> Teachers { get; } = [];
+        public List<TeacherViewModel> Teachers { get; } = [];
 
         public List<InstrumentViewModel> Instruments { get; set; } = [];
 

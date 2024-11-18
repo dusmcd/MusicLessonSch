@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MusicLessonSch.Models
 {
-    public class Student
+    public class Student : Model
     {
         public int Id { get; set; }
 

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MusicLessonSch.Models
 {
-    public class InstrumentViewModel
+    public class InstrumentViewModel : ViewModel
     {
         public int Id { get; set; }
 
@@ -13,10 +13,16 @@ namespace MusicLessonSch.Models
         [DisplayName("Minimum Age")]
         public int MinAge { get; set; }
 
-        public List<Student> Students { get; } = [];
-
-        public List<Teacher> Teachers { get; } = [];
-
         public bool IsRemoved { get; set; }
+
+        public override ViewModel Copy()
+        {
+            InstrumentViewModel viewModel = new InstrumentViewModel();
+            viewModel.Id = Id;
+            viewModel.Name = Name;
+            viewModel.MinAge = MinAge;
+
+            return viewModel;
+        }
     }
 }
