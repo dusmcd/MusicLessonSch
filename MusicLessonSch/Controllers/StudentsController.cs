@@ -57,6 +57,9 @@ namespace MusicLessonSch.Controllers
                 .Where(i => !i.Students.Any(s => s.Id == id))
                 .ToArrayAsync();
 
+            if (instruments.Length == 0)
+                return RedirectToAction("Index");
+
             InstrumentViewModel[] viewModels = new InstrumentViewModel[instruments.Length];
             Instrument.MapListVMToModel(instruments, viewModels, new InstrumentViewModel() { });
 
@@ -84,12 +87,17 @@ namespace MusicLessonSch.Controllers
 
         }
 
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int? id)
         {
+            if (id == null) return RedirectToAction("Index");
+
+
             Student student = await _context.Student
                 .Where(s => s.Id == id)
                 .Include(s => s.Instruments)
                 .FirstAsync();
+
+            if (student == null) return RedirectToAction("Index");
 
             int numInst = student.Instruments.Count();
             InstrumentViewModel[] viewModels = new InstrumentViewModel[numInst];
@@ -101,6 +109,50 @@ namespace MusicLessonSch.Controllers
             studentVM.Instruments = viewModels.ToList();
 
             return View(studentVM);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int? id, [Bind("Id","Name","Age","PhoneNumber","Email","Instruments")] StudentViewModel studentVM)
+        {
+            if (id == null || id != studentVM.Id)
+                return RedirectToAction("Index");
+
+            Student student = _context.Student
+                .Where(s => s.Id == id)
+                .Include(s => s.Instruments)
+                .First();
+            if (student == null)
+                return RedirectToAction("Index");
+
+            studentVM.MapPropsToModel(student);
+            List<Instrument> removedInstruments = GetRemovedInstruments(studentVM.Instruments);
+
+            foreach(Instrument instr in removedInstruments)
+            {
+                student.Instruments.Remove(instr);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
+
+        }
+
+        private List<Instrument> GetRemovedInstruments(List<InstrumentViewModel> instruments)
+        {
+            List<Instrument> result = new List<Instrument>();
+            
+            foreach(var instr in instruments)
+            {
+                if (instr.IsRemoved)
+                {
+                    Instrument instrument = _context.Instrument.Find(instr.Id)!;
+                    result.Add(instrument);
+                }
+            }
+
+            return result;
         }
     }
 }
