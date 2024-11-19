@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using MusicLessonSch.Data;
 using MusicLessonSch.Models;
@@ -47,6 +48,59 @@ namespace MusicLessonSch.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> AddInstrument(int id, string name)
+        {
+            Instrument[] instruments = await _context.Instrument
+                .Include(i => i.Students)
+                .Where(i => !i.Students.Any(s => s.Id == id))
+                .ToArrayAsync();
+
+            InstrumentViewModel[] viewModels = new InstrumentViewModel[instruments.Length];
+            Instrument.MapListVMToModel(instruments, viewModels, new InstrumentViewModel() { });
+
+            StudentViewModel studentVM = new StudentViewModel()
+            {
+                Id = id,
+                Name = name,
+                Instruments = viewModels.ToList()
+            };
+
+            return View(studentVM);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddInstrument([Bind("Id","InstrumentId")] StudentViewModel studentVM)
+        {
+            Student student = _context.Student.Find(studentVM.Id)!;
+            Instrument instrument = _context.Instrument.Find(studentVM.InstrumentId)!;
+
+            student.Instruments.Add(instrument);
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index");
+
+        }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            Student student = await _context.Student
+                .Where(s => s.Id == id)
+                .Include(s => s.Instruments)
+                .FirstAsync();
+
+            int numInst = student.Instruments.Count();
+            InstrumentViewModel[] viewModels = new InstrumentViewModel[numInst];
+            InstrumentViewModel defaultVM = new InstrumentViewModel() { };
+            Instrument.MapListVMToModel(student.Instruments.ToArray(), viewModels, defaultVM);
+
+            StudentViewModel studentVM = new StudentViewModel() { };
+            student.MapPropsToVM(studentVM);
+            studentVM.Instruments = viewModels.ToList();
+
+            return View(studentVM);
         }
     }
 }

@@ -1,42 +1,19 @@
 ﻿@model MusicLessonSch.Models.TeacherViewModel
 @{
     ViewData["Title"] = "Add Teacher";
+    ViewData["Action"] = "Create";
+    ViewData["Button"] = "Create";
+    ViewData["Header"] = "Add a teacher";
+    Layout = "Teachers/_CreateEdit";
 }
 
-<h1>Add Teacher</h1>
 
-<a asp-action="Index">Back to list</a>
-<form asp-action="Create" method="post">
-    <div class="form-group">
-        <label asp-for="Name"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="PhoneNumber"></label>
-        <input asp-for="PhoneNumber" class="form-control" />
-        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Email"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="DateOfBirth"></label>
-        <input asp-for="DateOfBirth" class="form-control" />
-        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="InstrumentId"></label>
-        <select asp-for="InstrumentId" class="form-select">
-            <option value="">Select an instrument</option>
-            @foreach (var i in Model.Instruments)
-            {
-                <option value="@i.Id">@i.Name</option>
-            }
-        </select>
-        <span asp-validation-for="InstrumentId" class="text-danger"></span>
-    </div>
-    <button type="submit" class="btn btn-primary">Create</button>
-</form>
+<label asp-for="InstrumentId"></label>
+<select asp-for="InstrumentId" class="form-select">
+    <option value="">Select an instrument</option>
+    @foreach (var i in Model.Instruments)
+    {
+        <option value="@i.Id">@i.Name</option>
+    }
+</select>
+<span asp-validation-for="InstrumentId" class="text-danger"></span>

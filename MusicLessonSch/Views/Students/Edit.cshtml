@@ -1,0 +1,24 @@
+﻿@model MusicLessonSch.Models.StudentViewModel;
+@{
+    Layout = "Students/_StudentCreateEdit";
+    ViewData["Button"] = "Update";
+    ViewData["Header"] = "Edit teacher";
+    ViewData["Title"] = "Edit teacher";
+    ViewData["Action"] = "Edit";
+}
+
+<label asp-for="Instruments"></label>
+<p class="text-danger">
+    Select instruments that you want to remove from this student
+</p>
+<ul>
+
+    @for(int i = 0; i < Model.Instruments.Count; i++)
+    {
+        <li>
+            <input type="checkbox" asp-for="@Model.Instruments[i].IsRemoved" class="form-check-input" id="@Model.Instruments[i].Id" />
+            <label for="@Model.Instruments[i].Id" class="form-check-label">@Html.DisplayFor(m => Model.Instruments[i].Name)</label>
+            <input type="hidden" asp-for="@Model.Instruments[i].Id" />
+        </li>    
+    }
+</ul>

@@ -1,47 +1,23 @@
 ﻿@model MusicLessonSch.Models.TeacherViewModel;
 @{
     ViewData["Title"] = "Edit Teacher";
+    ViewData["Header"] = "Edit teacher";
+    ViewData["Action"] = "Edit";
+    ViewData["Button"] = "Update";
+    Layout = "Teachers/_CreateEdit";
 }
 
-<h1>Edit Teacher</h1>
 
-<a asp-action="Index">Back to list</a>
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="Id" />
-    <div class="form-group">
-        <label asp-for="Name"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="PhoneNumber"></label>
-        <input asp-for="PhoneNumber" class="form-control" />
-        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Email"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="DateOfBirth"></label>
-        <input asp-for="DateOfBirth" class="form-control" />
-        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Instruments"></label>
-        <p class="text-danger">Select instruments that you want to remove from this teacher</p>
-        <ul>
-            @for(int i = 0; i < Model.Instruments.Count; i++)
-            {
-                <li> 
-                    <input type="checkbox" asp-for="@Model.Instruments[i].IsRemoved" id="@Model.Instruments[i].Id" />
-                    <label for="@Model.Instruments[i].Id">@Html.DisplayFor(m => Model.Instruments[i].Name)</label>
-                    <input type="hidden" asp-for="@Model.Instruments[i].Name" />
-                    <input type="hidden" asp-for="@Model.Instruments[i].Id" />
-                </li>
-            }
-        </ul>
-    </div>
-    <button type="submit" class="btn btn-primary">Update</button>
-</form>
+<label asp-for="Instruments"></label>
+<p class="text-danger">Select instruments that you want to remove from this teacher</p>
+<ul>
+    @for(int i = 0; i < Model.Instruments.Count; i++)
+    {
+        <li> 
+            <input type="checkbox" asp-for="@Model.Instruments[i].IsRemoved" id="@Model.Instruments[i].Id" class="form-check-input"/>
+            <label for="@Model.Instruments[i].Id" class="form-check-label">@Html.DisplayFor(m => Model.Instruments[i].Name)</label>
+            <input type="hidden" asp-for="@Model.Instruments[i].Name" />
+            <input type="hidden" asp-for="@Model.Instruments[i].Id" />
+        </li>
+    }
+</ul>

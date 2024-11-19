@@ -1,0 +1,26 @@
+﻿@model MusicLessonSch.Models.StudentViewModel
+@{
+    ViewData["Title"] = "Add Instrument to Student";
+}
+
+<h1>Add instrument to student</h1>
+<a asp-action="Index">Back to list</a>
+<p>
+    Select an instrument for student, @Html.DisplayFor(m => m.Name)
+</p>
+
+<form asp-action="AddInstrument" method="post">
+    <div class="form-group">
+        <label asp-for="InstrumentId"></label>
+        <select asp-for="InstrumentId" class="form-select">
+            <option value="">Select an instrument</option>
+            @foreach(var item in Model.Instruments)
+            {
+                <option value="@item.Id">@Html.DisplayFor(i => item.Name)</option>
+            }
+        </select>
+        <span asp-validation-for="InstrumentId" class="text-danger"></span>
+    </div>
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-primary">Add Instrument</button>
+</form>
