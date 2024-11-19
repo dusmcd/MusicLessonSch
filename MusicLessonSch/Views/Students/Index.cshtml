@@ -15,6 +15,7 @@
             <th>@Html.DisplayNameFor(m => m.Instruments)</th>
             <th></th>
             <th></th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -40,6 +41,9 @@
                 </td>
                 <td>
                     <a href="/Students/Edit/@student.Id">Edit Student</a>
+                </td>
+                <td>
+                    <a href="/Students/Delete/@student.Id">Delete Student</a>
                 </td>
             </tr>
         }

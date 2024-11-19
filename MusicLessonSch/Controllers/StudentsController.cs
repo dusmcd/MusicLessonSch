@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using MusicLessonSch.Data;
 using MusicLessonSch.Models;
+using System.Data;
 
 namespace MusicLessonSch.Controllers
 {
@@ -39,6 +40,9 @@ namespace MusicLessonSch.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id","Name","PhoneNumber","Email","Age", "InstrumentId")] StudentViewModel studentVM)
         {
+            if (!ModelState.IsValid)
+                return RedirectToAction("Index");
+
             Student student = new Student { };
             studentVM.MapPropsToModel(student);
             var instrument = _context.Instrument.Find(studentVM.InstrumentId);
@@ -77,6 +81,9 @@ namespace MusicLessonSch.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddInstrument([Bind("Id","InstrumentId")] StudentViewModel studentVM)
         {
+            if (!ModelState.IsValid)
+                return RedirectToAction("Index");
+
             Student student = _context.Student.Find(studentVM.Id)!;
             Instrument instrument = _context.Instrument.Find(studentVM.InstrumentId)!;
 
@@ -115,6 +122,9 @@ namespace MusicLessonSch.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int? id, [Bind("Id","Name","Age","PhoneNumber","Email","Instruments")] StudentViewModel studentVM)
         {
+            if (!ModelState.IsValid)
+                return RedirectToAction("Index");
+
             if (id == null || id != studentVM.Id)
                 return RedirectToAction("Index");
 
@@ -125,15 +135,22 @@ namespace MusicLessonSch.Controllers
             if (student == null)
                 return RedirectToAction("Index");
 
-            studentVM.MapPropsToModel(student);
-            List<Instrument> removedInstruments = GetRemovedInstruments(studentVM.Instruments);
-
-            foreach(Instrument instr in removedInstruments)
+            try
             {
-                student.Instruments.Remove(instr);
-            }
+                studentVM.MapPropsToModel(student);
+                List<Instrument> removedInstruments = GetRemovedInstruments(studentVM.Instruments);
 
-            await _context.SaveChangesAsync();
+                foreach(Instrument instr in removedInstruments)
+                {
+                    student.Instruments.Remove(instr);
+                }
+
+                await _context.SaveChangesAsync();
+
+            } catch(DbUpdateConcurrencyException)
+            {
+                throw;
+            }
 
             return RedirectToAction("Index");
 
@@ -153,6 +170,33 @@ namespace MusicLessonSch.Controllers
             }
 
             return result;
+        }
+
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+                return RedirectToAction("Index");
+
+            Student student = await _context.Student.FindAsync(id) ?? new Student();
+            if (student == null)
+                return RedirectToAction("Index");
+
+            return View(student);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirm(int id)
+        {
+            if (id == 0)
+                return RedirectToAction("Index");
+
+            Student student = _context.Student.Find(id)!;
+            _context.Student.Remove(student);
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
         }
     }
 }

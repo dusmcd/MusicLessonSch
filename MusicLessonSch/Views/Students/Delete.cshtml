@@ -1,0 +1,30 @@
+﻿@model MusicLessonSch.Models.Student;
+@{
+    ViewData["Title"] = "Delete student";
+}
+
+<h1>Confirm deletion of student</h1>
+<a asp-action="Index">Back to list</a>
+
+<p>
+    <strong>@Html.DisplayNameFor(m => m.Name)</strong>: @Html.DisplayFor(m => m.Name)
+</p>
+<p>
+    <strong>@Html.DisplayNameFor(m => m.Age)</strong>: @Html.DisplayFor(m => m.Age)
+</p>
+<p>
+    <strong>@Html.DisplayNameFor(m => m.PhoneNumber)</strong>: @Html.DisplayFor(m => m.PhoneNumber)
+</p>
+<p>
+    <strong>@Html.DisplayNameFor(m => m.Email)</strong>: @Html.DisplayFor(m => m.Email)
+</p>
+
+<p class="bg-danger text-white text-center p-2 rounded">
+    <em>Press button below to confirm deletion of this student. This action cannot be undone.</em>
+</p>
+
+<form asp-action="Delete" method="post">
+    <button type="submit" class="btn btn-danger">Delete</button>
+</form>
+
+

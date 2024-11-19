@@ -31,3 +31,9 @@
     </div>
     <button type="submit" class="btn btn-primary">@ViewData["Button"]</button>
 </form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
